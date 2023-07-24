@@ -3,7 +3,6 @@ import React, {
   createRef,
   DOMAttributes,
   useEffect,
-  useRef,
   useState,
 } from "react";
 import {
@@ -18,10 +17,13 @@ import {
   Button,
   Select,
   Option,
+  Spinner,
+  Tooltip,
 } from "@material-tailwind/react";
 import { FPhi, WidgetComponent } from "@facephi/selphid-widget-web";
 import { useNavigate } from "react-router-dom";
 import  face_IDMatchingData  from "../network/matching";
+import { CheckIcon } from "../components/checkbox";
 
 type CustomElement<T> = Partial<T & DOMAttributes<T> & { children: any }>;
 
@@ -43,13 +45,19 @@ function ID() {
     const navigate = useNavigate();
   const style = {
     wrapper: "sm:flex sm:flex-row sm:w-full sm:h-screen  flex flex-col w-full",
+    logo: "sm:flex sm:flex-row sm:items-top sm:w-48  flex flex-row items-center w-24",
     left: "sm:flex sm:flex-col sm:h-4/5 justify-center mt-24  flex flex-1 items-center sm:justify-center ",
     right:
       "bg-[#f6f9ff] sm:flex sm:flex-col flex-1 items-center  justify-center",
     btn: " sm:flex sm:flex-row sm:space-x-8 sm:my-12 p-4",
     bottommiddle:
       "sm:flex sm:flex-row sm:items-center sm:h-72 space-x-8 sm:justify-center",
-    cardbody: " space-y-12 items-center",
+    cardbody: " space-y-12 items-center", tt: "bg-white font-nunito font-thin text-[#444444]",
+    squareRow: "flex flex-col items-center space-y-2 ",
+    icon: "sm:w-11/12 sm:items-center sm:shadow-2xl sm:rounded-2xl sm:p-4      w-24 items-center shadow-2xl rounded-lg p-4",
+    lIcon: "sm:w-6 w-5", status:
+    "sm:font-nunito sm:font-bold sm:text-xs sm:text-[#444444]     font-nunito font-bold text-[10px] text-[#444444]",
+  
   };
   const FPhiCameraResolutions: MapType = {
     res480p: { title: "640x480", width: 640, height: 480 },
@@ -124,20 +132,20 @@ function ID() {
       console.log("Document front:", JSON.stringify(frontResult));
       localStorage.setItem('frontResult', JSON.stringify(frontResult));
     }
-    matchingCheck(JSON.stringify(frontResult)) 
+    matchingCheck(frontResult) 
   
   };
 
 
   async function matchingCheck(data:any) {
+    setIsCaptured(true);
     try {
       const response = await face_IDMatchingData(data); // Call the fetchData function to make the API request
       console.log(response); // Handle the response as needed
-       // Auto-navigate back
-       navigate(-1);
+      
        setIsWidgetCaptureStarted(false);
        setWidgetStartSimpleMode(false);
-       navigate(-1);
+       //navigate(-1);
     } catch (error) {
       console.error("Error during API request:", error);
     }
@@ -179,6 +187,7 @@ function ID() {
   // Create references
   const widgetRef: Ref<HTMLElement> = createRef();
   const [componentMounted, setComponentMounted] = useState(false);
+  const [isCaptured, setIsCaptured] = useState(false);
 
   useEffect(() => {
     if (!componentMounted) {
@@ -212,8 +221,65 @@ function ID() {
   return (
     <div className={style.wrapper}>
       <div className={style.left}>
+
+      {isCaptured && isWidgetCaptureStarted && <Spinner className="h-16 w-16 text-midnight text-center" />}
+      {!isWidgetCaptureStarted && 
+      
+      <Card  variant="gradient" className="bg-black w-full max-w-[30rem] p-8">
+      <CardHeader
+        floated={false}
+        shadow={false}
+        color="transparent"
+        className="m-0 mb-8 rounded-none border-b border-white/10 pb-8 text-center"
+      >
+        <Typography
+          variant="small"
+          color="white"
+          className="font-normal uppercase"
+        >
+          Capturing guidelines
+        </Typography>
+        <Typography
+          variant="h1"
+          color="white"
+          className="mt-6 flex justify-center gap-1 font-bold font-nunito text-7xl font-normal"
+        >
+          <span className="mt-2 text-lg font-bold font-nunito">Document Capturing help</span>{" "}
+          
+        </Typography>
+      </CardHeader>
+      <CardBody className="p-0">
+        <ul className="flex flex-col gap-4">
+          <li className="flex items-center gap-4">
+            <span className="rounded-full border border-white/20 bg-white p-1">
+              <CheckIcon />
+            </span>
+            <Typography className="font-normal">Ensure the document fills the capture window</Typography>
+          </li>
+          <li className="flex items-center gap-4">
+            <span className="rounded-full border border-white/20 bg-white p-1">
+              <CheckIcon />
+            </span>
+            <Typography className="font-normal">Keep document in the center of the image capture</Typography>
+          </li>
+          <li className="flex items-center gap-4">
+            <span className="rounded-full border border-white/20 bg-white p-1">
+              <CheckIcon />
+            </span>
+            <Typography className="font-normal">Document must not be faded</Typography>
+          </li>
+          <li className="flex items-center gap-4">
+            <span className="rounded-full border border-white/20 bg-white p-1">
+              <CheckIcon />
+            </span>
+            <Typography className="font-normal">Be in a well lit place</Typography>
+          </li>
+          
+        </ul>
+      </CardBody>
+      
+    </Card>}
           {isWidgetCaptureStarted && (
-    
           <facephi-selphid
             ref={widgetRef}
             className={`bg-midnight items-center mt-12`}
@@ -242,7 +308,30 @@ function ID() {
         )}
       </div>
       <div className={style.right}>
-        <div className={style.bottommiddle}>
+      <img className={style.logo} src="blue.png" alt="logo" />
+      <Tooltip
+                className={style.tt}
+                content="Click to begin ID capturing"
+              >
+                <div className={style.squareRow}>
+                  <img src="id.png" alt="" className={style.icon} />
+                  <img
+                    src={
+                      isCaptured
+                        ? "v2.png"
+                        : "v1.png"
+                    }
+                    alt=""
+                    className={style.lIcon}
+                  />
+                  <span className={style.status}>
+                    {isWidgetCaptureStarted
+                      ? "ID Capture Completed"
+                      : "Begin ID Document Capturing"}
+                  </span>
+                </div>
+              </Tooltip>
+        {/* <div className={style.bottommiddle}>
           <Card>
             <List>
               <ListItem className="p-0">
@@ -431,7 +520,7 @@ function ID() {
               </div>
             </CardBody>
           </Card>
-        </div>
+        </div> */}
         <div className={style.btn}>
           <Button
             id="btnStartCapture"
@@ -448,7 +537,7 @@ function ID() {
             disabled={isWidgetCaptureStarted}
           >
             {" "}
-            Start Simple Mode
+            Upload document
           </Button>
           <Button
             color="red"
