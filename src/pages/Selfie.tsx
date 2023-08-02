@@ -194,6 +194,7 @@ function Selfie(props: {}) {
         "BestImageCropped: ",
         extractionResult.detail.bestImageCropped.src
       );
+     
 
     console.log("Template: ", extractionResult.detail.template);
     console.log("TemplateRaw: ", extractionResult.detail.templateRaw);

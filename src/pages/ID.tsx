@@ -119,32 +119,33 @@ function ID() {
 
     const backResult = extractionResult.detail.images.backDocument || null;
     const frontResult = extractionResult.detail.images.frontDocument || null;
-    //const docCaptured = extractionResult.detail.extractionData || null;
+    const faceImage = extractionResult.detail.images.faceImage || null;
 
-    //console.log("Document Captured:", JSON.stringify(docCaptured));
+        console.log("Document faceImage:", JSON.stringify(faceImage));
 
     if (backResult !== null) {
-      console.log("Document back:", JSON.stringify(backResult));
+      console.log("Document back:", backResult);
       localStorage.setItem('backResult', JSON.stringify(backResult));
     }
 
     if (frontResult !== null) {
-      console.log("Document front:", JSON.stringify(frontResult));
+      console.log("Document front:", frontResult);
       localStorage.setItem('frontResult', JSON.stringify(frontResult));
     }
-    matchingCheck(frontResult) 
+    matchingCheck(frontResult)
   
   };
 
 
   async function matchingCheck(data:any) {
     setIsCaptured(true);
+    setIsWidgetCaptureStarted(false);
+    setWidgetStartSimpleMode(false);
     try {
       const response = await face_IDMatchingData(data); // Call the fetchData function to make the API request
-      console.log(response); // Handle the response as needed
+      console.log(`this is res${response}`); // Handle the response as needed
       
-       setIsWidgetCaptureStarted(false);
-       setWidgetStartSimpleMode(false);
+    
        //navigate(-1);
     } catch (error) {
       console.error("Error during API request:", error);
@@ -195,7 +196,6 @@ function ID() {
     } else {
       if (isWidgetCaptureStarted) {
         const node = widgetRef.current;
-
         if (node) {
           node.addEventListener("onModuleLoaded", onModuleLoaded);
           node.addEventListener("onExtractionFinished", onExtractionFinished);
@@ -273,11 +273,9 @@ function ID() {
               <CheckIcon />
             </span>
             <Typography className="font-normal">Be in a well lit place</Typography>
-          </li>
-          
+          </li> 
         </ul>
       </CardBody>
-      
     </Card>}
           {isWidgetCaptureStarted && (
           <facephi-selphid
@@ -297,7 +295,7 @@ function ID() {
             }}
             cameraWidth={widgetCameraWidth}
             cameraHeight={widgetCameraHeight}
-            specificData={"ES"}
+            specificData={"US"}
             videoRecord={widgetVideoRecord}
             videoRecordType={FPhi.SelphID.RecorderType.Remote}
             videoRecordScale={widgetCameraWidth < 1280 ? 1 : 0.5}

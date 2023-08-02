@@ -55,6 +55,9 @@ function Home() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    let facetemplateRaw = localStorage.getItem("imageTemplateRaw");
+
+    console.log(`this is ${facetemplateRaw}`)
     //localStorage.clear();
     const selfieResult = localStorage.getItem("bestImageTemplate");
     const idBackResult = localStorage.getItem("backResult");
@@ -91,6 +94,12 @@ function Home() {
     }
   };
 
+  const urlParams = new URLSearchParams(window.location.search);
+const id = urlParams.get('id');
+console.log(id); // This will log the received ID from the URL
+
+let facetemplateRaw = localStorage.getItem("imageTemplateRaw");
+console.log(`facetemplytae ${facetemplateRaw}`); 
   return (
     <>
       <div>
